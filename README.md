@@ -15,3 +15,9 @@ A structured action item list, where each item includes: the task to be complete
 
 **Why this task is valuable enough to automate:**
 After every meeting, someone must manually review notes, extract tasks, and distribute them — a repetitive, time-consuming step that often gets delayed or done inconsistently. Automating this with an LLM reduces the turnaround time from hours to seconds, ensures nothing is missed, and frees the meeting organizer to focus on higher-value work. Even if a human reviews the output before sending, the draft generation alone saves significant effort.
+
+---
+
+## Walkthrough Video
+
+[https://youtu.be/Yy_o8aR1GB8](https://youtu.be/Yy_o8aR1GB8)

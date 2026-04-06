@@ -6,12 +6,12 @@ Usage:
 """
 
 import argparse
-import google.generativeai as genai
+from google import genai
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
-API_KEY = "AIzaSyBR4U4Tr5Sqr0vW7W8_tqdQzC7a3KA4xLM"
-MODEL   = "gemini-2.0-flash"
+API_KEY = "AIzaSyAxfMRB1de7isPf8ngtKQ8Yh3W9KXFVcak"
+MODEL   = "gemini-2.5-flash"
 
 SYSTEM_PROMPT = """
 You are a professional meeting assistant. Your job is to read raw meeting notes
@@ -101,12 +101,12 @@ EVAL_CASES = [
 # ── Core function ─────────────────────────────────────────────────────────────
 
 def extract_action_items(notes: str) -> str:
-    genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel(
-        model_name=MODEL,
-        system_instruction=SYSTEM_PROMPT,
+    client = genai.Client(api_key=API_KEY)
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=notes,
+        config={"system_instruction": SYSTEM_PROMPT},
     )
-    response = model.generate_content(notes)
     return response.text.strip()
 
 # ── CLI entry point ───────────────────────────────────────────────────────────
