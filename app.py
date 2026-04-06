@@ -1,10 +1,8 @@
-
 """
-Meeting Notes to Action Items — Initial Version (v0)
-This file records the original prompt before any revisions.
+Meeting Notes to Action Items
 Usage:
-  python app_v0_initial.py                        # runs all eval cases
-  python app_v0_initial.py --notes "your notes"   # run a single custom input
+  python app.py                        # runs all eval cases
+  python app.py --notes "your notes"   # run a single custom input
 """
 
 import argparse
@@ -17,19 +15,31 @@ MODEL   = "gemini-2.0-flash"
 
 SYSTEM_PROMPT = """
 You are a professional meeting assistant. Your job is to read raw meeting notes
-and extract a clean, structured action item list.
+and produce a structured output with three sections.
 
-For each action item, output exactly this format:
+### Meeting Summary
+One sentence describing what the meeting was about and who attended (if mentioned).
+
+### Action Items
+List only tasks where someone clearly committed to doing something.
+For each item use this format:
 - [ ] Task: <what needs to be done>
   Owner: <person responsible, or "Unassigned" if not mentioned>
   Due: <deadline, or "Not specified" if not mentioned>
 
+### Needs Follow-Up
+List topics that were raised but have no confirmed owner or decision.
+For each item use this format:
+- Topic: <what was discussed>
+  Status: <why it needs follow-up — no owner, no deadline, uncertain language, etc.>
+
 Rules:
-- Only include items that represent a clear, committed action.
-- Do NOT invent owners or deadlines that are not stated.
-- If the notes contain only vague or uncertain language, say:
-  "No confirmed action items found. Human review recommended."
-- Do not add commentary outside the action item list.
+- Only place an item in "Action Items" if someone explicitly committed to it.
+- Do NOT invent owners or deadlines that are not stated in the notes.
+- Treat hedging language ("might", "probably", "maybe", "kind of", "at some point") as a signal to place the item in "Needs Follow-Up", not "Action Items".
+- If the notes are too vague to extract anything, write under Meeting Summary: "No actionable content found. Human review recommended." and leave the other two sections empty.
+- Always include all three section headers in every response, even if a section has no items.
+- Do not add any commentary outside these three sections.
 """
 
 # ── Eval cases ───────────────────────────────────────────────────────────────
@@ -102,7 +112,7 @@ def extract_action_items(notes: str) -> str:
 # ── CLI entry point ───────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Meeting Notes → Action Items (Initial Version)")
+    parser = argparse.ArgumentParser(description="Meeting Notes → Action Items")
     parser.add_argument("--notes", type=str, default=None,
                         help="Meeting notes as a string. If omitted, runs all eval cases.")
     args = parser.parse_args()
@@ -110,6 +120,7 @@ def main():
     output_lines = []
 
     if args.notes:
+        # Single custom input
         cases = [{"id": "Custom Input", "notes": args.notes}]
     else:
         cases = EVAL_CASES
@@ -132,7 +143,8 @@ def main():
         print(separator)
         output_lines.append(separator)
 
-    output_path = "output_v0.txt"
+    # Save to file
+    output_path = "output.txt"
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("\n".join(output_lines))
     print(f"Results saved to {output_path}")
